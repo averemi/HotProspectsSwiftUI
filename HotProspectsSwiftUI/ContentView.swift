@@ -29,11 +29,27 @@ struct DisplayView: View {
 
 struct ContentView: View {
     @StateObject var user = User()
+    @State private var selectedTab = "One"
     
     var body: some View {
-        VStack {
-            EditView().environmentObject(user)
-            DisplayView().environmentObject(user)
+        TabView(selection: $selectedTab) {
+            VStack {
+                Text("Tab 1")
+                EditView().environmentObject(user)
+                DisplayView().environmentObject(user)
+            }
+            .onTapGesture {
+                selectedTab = "Two"
+            }
+            .tabItem {
+                Label("One", systemImage: "star")
+            }
+                
+            Text("Tab 2")
+                .tabItem {
+                    Label("Two", systemImage: "circle")
+                }
+                .tag("Two")
         }
     }
 }
