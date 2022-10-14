@@ -7,50 +7,27 @@
 
 import SwiftUI
 
-@MainActor class User: ObservableObject {
-    @Published var name = "Taylor Swift"
-}
-
-struct EditView: View {
-    @EnvironmentObject var user: User
-    
-    var body: some View {
-        TextField("Name", text: $user.name)
+@MainActor class DisplayedUpdated: ObservableObject {
+    var value = 0 {
+        willSet {
+            objectWillChange.send()
+        }
     }
-}
 
-struct DisplayView: View {
-    @EnvironmentObject var user: User
-    
-    var body: some View {
-        Text(user.name)
+    init() {
+        for i in 1...10 {
+            DispatchQueue.main.asyncAfter(deadline: .now() + Double(i)) {
+                self.value += 1
+            }
+        }
     }
 }
 
 struct ContentView: View {
-    @StateObject var user = User()
-    @State private var selectedTab = "One"
+    @StateObject private var updater = DisplayedUpdated()
     
     var body: some View {
-        TabView(selection: $selectedTab) {
-            VStack {
-                Text("Tab 1")
-                EditView().environmentObject(user)
-                DisplayView().environmentObject(user)
-            }
-            .onTapGesture {
-                selectedTab = "Two"
-            }
-            .tabItem {
-                Label("One", systemImage: "star")
-            }
-                
-            Text("Tab 2")
-                .tabItem {
-                    Label("Two", systemImage: "circle")
-                }
-                .tag("Two")
-        }
+        Text("Value is \(updater.value)")
     }
 }
 
