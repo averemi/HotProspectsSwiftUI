@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct Prospect {
+struct Prospect: Identifiable {
     var id = UUID()
     var name = "Anonymous"
     var emailAddress = ""
