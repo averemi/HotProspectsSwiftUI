@@ -14,7 +14,7 @@ struct Prospect: Identifiable {
     var isContacted = false
 }
 
-class Prospects: ObservableObject {
+@MainActor class Prospects: ObservableObject {
     @Published var people: [Prospect]
     
     init() {
