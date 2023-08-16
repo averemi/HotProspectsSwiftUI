@@ -7,7 +7,9 @@
 
 import SwiftUI
 
-class Prospect: Identifiable {
+private let peopleCodingKey = "SavedPeople"
+
+class Prospect: Identifiable, Codable {
     var id = UUID()
     var name = "Anonymous"
     var emailAddress = ""
@@ -15,14 +17,32 @@ class Prospect: Identifiable {
 }
 
 @MainActor class Prospects: ObservableObject {
-    @Published var people: [Prospect]
+    @Published private(set) var people: [Prospect]
     
     init() {
-        people = []
+        if let data = UserDefaults.standard.data(forKey: peopleCodingKey),
+           let decodedData = try? JSONDecoder().decode([Prospect].self, from: data) {
+            people = decodedData
+        } else {
+            people = []
+        }
+    }
+
+    // encapsulation principle
+    func add(_ prospect: Prospect) {
+        people.append(prospect)
+        saveData()
     }
 
     func toggle(_ prospect: Prospect) {
         objectWillChange.send()
         prospect.isContacted.toggle()
+        saveData()
+    }
+
+    private func saveData() {
+        if let encodedData = try? JSONEncoder().encode(people) {
+            UserDefaults.standard.set(encodedData, forKey: peopleCodingKey)
+        }
     }
 }
